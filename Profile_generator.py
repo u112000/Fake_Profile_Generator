@@ -1,4 +1,6 @@
 #! python3
+# Developed by u11200
+# 2025
 import requests
 import json
 import random
