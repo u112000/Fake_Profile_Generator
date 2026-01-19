@@ -63,7 +63,7 @@ class ProfileGen:
         M_image_url = f"{self.api_url['results'][0]['picture']['medium']}"
         M_imagefile_name = f"MEDIUM_IMAGE-{self.api_url['results'][0]['name']['first']}_{self.api_url['results'][0]['name']['last']}.jpg"
         L_image_url = f"{self.api_url['results'][0]['picture']['large']}"
-        L_imagefile_name = f"large_{self.api_url['results'][0]['name']['first']}_{self.api_url['results'][0]['name']['last']}.jpg"
+        L_imagefile_name = f"LARGE_IMAGE-_{self.api_url['results'][0]['name']['first']}_{self.api_url['results'][0]['name']['last']}.jpg"
 
         if mfile:
             with requests.get(M_image_url, stream=True) as mfr, open(M_imagefile_name, 'wb') as mf:
