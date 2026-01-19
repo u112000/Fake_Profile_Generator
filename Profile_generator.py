@@ -1,68 +1,92 @@
 #! python3
-# Developed by u11200
-# 2025
-import requests
-import json
-import random
+
+###########################################################################
+# Name:         Profile_generator
+# Purpose:     Generation of bio-data, credentials, social details and geo-location status with ease.
+
+# Author:       U_x112000
+
+# Created:    ...
+# Encoding:  utf-8
+###########################################################################
+
 import os
+import json
+import secrets
+import requests
 from rich import print
+from rich.table import Table
 
-api_url = 'https://randomuser.me/api/'
+class ProfileGen:
+    def __init__(self):
+        self.api_url: dict = self.connections('https://randomuser.me/api/')
+        self.data: dict = {
+            'Name': f"{self.api_url['results'][0]['name']['title']}. {self.api_url['results'][0]['name']['first']} {self.api_url['results'][0]['name']['last']}",
+            'Gender': f"{self.api_url['results'][0]['gender']}",
+            'Age': f"{self.api_url['results'][0]['dob']['age']}",
+            'Date Of Birth': f"{self.api_url['results'][0]['dob']['date']}",
+            'Medium Face snapshot': f"{self.download_image(mfile=True)}",
+            'Large Face snapshot': f"{self.download_image(lfile=True)}",
+            'Nationality': f"{self.api_url['results'][0]['nat']} ({self.api_url['results'][0]['location']['country']}",
+            'Street Address': f"{self.api_url['results'][0]['location']['street']['number']}",
+            'Street Name': f"{self.api_url['results'][0]['location']['street']['name']}",
+            'City': f"{self.api_url['results'][0]['location']['city']}",
+            'State': f"{self.api_url['results'][0]['location']['state']}",
+            'Country': f"{self.api_url['results'][0]['location']['country']}",
+            'Post-Code': f"{self.api_url['results'][0]['location']['postcode']}",
+            'Email': f"{self.api_url['results'][0]['email']}",
+            'Current Location': f"{self.api_url['results'][0]['location']['timezone']['description']}",
+            'Longitude & Latitude': f"{self.api_url['results'][0]['location']['coordinates']['longitude']} {self.api_url['results'][0]['location']['coordinates']['latitude']}",
+            'UUID': f"{self.api_url['results'][0]['login']['uuid']}",
+            'Username': f"{self.api_url['results'][0]['login']['username']}",
+            'Password': f"{self.generate_password()}"}
+        
+    def __str__(self):
+        return f'Fake profile generator object using {self.api_url}'
 
-r = requests.get(api_url)
-database = json.loads(r.text)
-def solid():
-    passwd = ['cb#c@', '9en$UW@2', '8HWN27£', 'O28$$$#82WN', 'W£927jsv', 'Niw92a$S']
-    passwd_ = []
-    for i in range(1, 3+1):
-        random.shuffle(passwd)
-        passwd_.append(random.choice(passwd))
-    return ''.join(passwd_)
+    def connections(self, url):
+        try:
+            r = requests.get(url)
+        except:
+            raise Exception(f'Unable to connect with website api\n{self.api_url} offline')
+        else:
+            if r.status_code == 200:
+                return r.json()
+            else:
+                raise Exception('Website not responding')
+            
+    def generate_password(self, lenght=12):
+        passwd = secrets.token_urlsafe(lenght)
+        return passwd
 
-def downloaderm():
-    r2 = requests.get(f'{database['results'][0]['picture']['medium']}', stream=True)
-    f = open(f'medium_{database['results'][0]['name']['first']}_{database['results'][0]['name']['last']}.jpg', 'wb')
-    for i in r2:
-        f.write(i)
-    f.close()
-    if os.stat(f'medium_{database['results'][0]['name']['first']}_{database['results'][0]['name']['last']}.jpg').st_size > 0:
-        return 'SUCCESSFULLY DOWNLOADED MEDIUM IMAGE'
-    else:
-        return 'DOWNLOAD FAILED!'
+    def download_image(self, lfile=False, mfile=False):
+        M_image_url = f"{self.api_url['results'][0]['picture']['medium']}"
+        M_imagefile_name = f"MEDIUM_IMAGE-{self.api_url['results'][0]['name']['first']}_{self.api_url['results'][0]['name']['last']}.jpg"
+        L_image_url = f"{self.api_url['results'][0]['picture']['large']}"
+        L_imagefile_name = f"large_{self.api_url['results'][0]['name']['first']}_{self.api_url['results'][0]['name']['last']}.jpg"
 
-def downloaderl():
-    r2 = requests.get(f'{database['results'][0]['picture']['large']}', stream=True)
-    f = open(f'large_{database['results'][0]['name']['first']}_{database['results'][0]['name']['last']}.jpg', 'wb')
-    for i in r2:
-        f.write(i)
-    f.close()
-    if os.stat(f'large_{database['results'][0]['name']['first']}_{database['results'][0]['name']['last']}.jpg').st_size > 0:
-        return 'SUCCESSFULLY DOWNLOADED LARGE IMAGE'
-    else:
-        return 'DOWNLOAD FAILED!'
+        if mfile:
+            with requests.get(M_image_url, stream=True) as mfr, open(M_imagefile_name, 'wb') as mf:
+                for chunk in mfr:
+                    mf.write(chunk)
+            m_image_download_stat = f"{'SUCCESSFULLY DOWNLOADED MEDIUM IMAGE'.title() if os.stat(M_imagefile_name).st_size > 0 else 'DOWNLOAD FAILED!'.title()}"
+            return m_image_download_stat
 
-print('*'*15 + '[reverse]Basic Details[/reverse]'+ '*'*15)
-print(f'[+] [bold underline]Name[/bold underline]:______________________ {database['results'][0]['name']['title']}. {database['results'][0]['name']['first']} {database['results'][0]['name']['last']}')
-print(f'[+] [bold underline]Gender[/bold underline]:____________________ {database['results'][0]['gender']}')
-print(f'[+] [bold underline]Age[/bold underline]:_______________________ {database['results'][0]['dob']['age']}')
-print(f'[+] [bold underline]DOB[/bold underline]:_______________________ {database['results'][0]['dob']['date'][:10]}')
-print(f'[+] [bold underline]M. Face snapshot link[/bold underline]:_____ Downloading: [green]{downloaderm()}[/green].')
-print(f'[+] [bold underline]L. Face snapshot link[/bold underline]:_____ Downloading: [green]{downloaderl()}[/green].')
-print(f'[+] [bold underline]Nationality[/bold underline]:_______________ {database['results'][0]['nat']} ({database['results'][0]['location']['country']})')
-print(r'[+]')
-print(r'[+]')
-print('*'*15 + '[reverse]Advanced Addtional Details[/reverse]'+ '*'*15)
-print(f'[+] [bold underline]Street Address[/bold underline]:____________ {database['results'][0]['location']['street']['number']}')
-print(f'[+] [bold underline]Street Name[/bold underline]:_______________ {database['results'][0]['location']['street']['name']}')
-print(f'[+] [bold underline]City[/bold underline]:______________________ {database['results'][0]['location']['city']}')
-print(f'[+] [bold underline]State[/bold underline]:_____________________ {database['results'][0]['location']['state']}')
-print(f'[+] [bold underline]Country[/bold underline]:___________________ {database['results'][0]['location']['country']}')
-print(f'[+] [bold underline]Post-Code[/bold underline]:_________________ {database['results'][0]['location']['postcode']}')
-print()
-print(f'[+] [bold underline]Email[/bold underline]:_____________________ {database['results'][0]['email']}')
-print(f'[+] [bold underline]Current Location[/bold underline]:__________ {database['results'][0]['location']['timezone']['description']}')
-print(f'[+] [bold underline]Longitude & Latitude[/bold underline]:______ {database['results'][0]['location']['coordinates']['longitude']} {database['results'][0]['location']['coordinates']['latitude']}')
-print(f'[+] [bold underline]UUID[/bold underline]:______________________ {database['results'][0]['login']['uuid']}')
-print(f'[+] [bold underline]Username[/bold underline]:__________________ {database['results'][0]['login']['username']}')
-print(f'[+] [bold underline]Password[/bold underline]:__________________ {solid()}{database['results'][0]['login']['password']}{solid()}')
-print()
+        elif lfile:
+            with requests.get(L_image_url, stream=True) as lfr, open(L_imagefile_name, 'wb') as lf:
+                for chunk in lfr:
+                    lf.write(chunk)
+            l_image_download_stat = f"{'SUCCESSFULLY DOWNLOADED Large IMAGE'.title() if os.stat(L_imagefile_name).st_size > 0 else 'DOWNLOAD FAILED!'.title()}"
+            return l_image_download_stat
+
+    def generate_gui(self):
+        t = Table()
+        t.add_column('Bio Fields', style='bold green')
+        t.add_column('Generated Bio-data', style='bold white')
+        for key, value in self.data.items():
+            t.add_row(key, value)
+        return t
+
+if __name__ == '__main__':
+    app = ProfileGen()
+    print(app.generate_gui())
