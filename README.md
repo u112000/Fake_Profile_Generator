@@ -9,8 +9,8 @@ It generates random user bio random details such as names, ages, and emails.
 - User friendly interface
 - Easy to run
 
-![Description of program live test](images/screenshot-01.jpg)
-![Download identity picture](images/screenshot-02.jpg)
+![Description of program live test](./images/screenshot-01.jpg)
+![Download identity picture](./images/screenshot-02.jpg)
 
 ## Installation
 Clone this repository:
