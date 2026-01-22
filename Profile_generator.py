@@ -27,7 +27,7 @@ class ProfileGen:
             'Date Of Birth': f"{self.api_url['results'][0]['dob']['date']}",
             'Medium Face snapshot': f"{self.download_image(mfile=True)}",
             'Large Face snapshot': f"{self.download_image(lfile=True)}",
-            'Nationality': f"{self.api_url['results'][0]['nat']} ({self.api_url['results'][0]['location']['country']}",
+            'Nationality': f"{self.api_url['results'][0]['nat']} {self.api_url['results'][0]['location']['country']}",
             'Street Address': f"{self.api_url['results'][0]['location']['street']['number']}",
             'Street Name': f"{self.api_url['results'][0]['location']['street']['name']}",
             'City': f"{self.api_url['results'][0]['location']['city']}",
@@ -46,7 +46,7 @@ class ProfileGen:
 
     def connections(self, url):
         try:
-            r = requests.get(url)
+            r = requests.get(url, timeout=10)
         except:
             raise Exception(f'Unable to connect with website api\n{self.api_url} offline')
         else:
@@ -55,8 +55,8 @@ class ProfileGen:
             else:
                 raise Exception('Website not responding')
             
-    def generate_password(self, lenght=12):
-        passwd = secrets.token_urlsafe(lenght)
+    def generate_password(self, length=12):
+        passwd = secrets.token_urlsafe(length)
         return passwd
 
     def download_image(self, lfile=False, mfile=False):
@@ -66,14 +66,14 @@ class ProfileGen:
         L_imagefile_name = f"LARGE_IMAGE-_{self.api_url['results'][0]['name']['first']}_{self.api_url['results'][0]['name']['last']}.jpg"
 
         if mfile:
-            with requests.get(M_image_url, stream=True) as mfr, open(M_imagefile_name, 'wb') as mf:
+            with requests.get(M_image_url, stream=True, timeout=10) as mfr, open(M_imagefile_name, 'wb') as mf:
                 for chunk in mfr:
                     mf.write(chunk)
             m_image_download_stat = f"{'SUCCESSFULLY DOWNLOADED MEDIUM IMAGE'.title() if os.stat(M_imagefile_name).st_size > 0 else 'DOWNLOAD FAILED!'.title()}"
             return m_image_download_stat
 
         elif lfile:
-            with requests.get(L_image_url, stream=True) as lfr, open(L_imagefile_name, 'wb') as lf:
+            with requests.get(L_image_url, stream=True, timeout=10) as lfr, open(L_imagefile_name, 'wb') as lf:
                 for chunk in lfr:
                     lf.write(chunk)
             l_image_download_stat = f"{'SUCCESSFULLY DOWNLOADED Large IMAGE'.title() if os.stat(L_imagefile_name).st_size > 0 else 'DOWNLOAD FAILED!'.title()}"
